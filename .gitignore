@@ -26,3 +26,9 @@ go.work.sum
 # OS
 .DS_Store
 Thumbs.db
+
+coverage.xml
+
+gendoc
+
+.scannerwork/
