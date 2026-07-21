@@ -3,8 +3,10 @@ package middleware
 import (
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	config "github.com/natifdevelopment/go-config"
 	"github.com/natifdevelopment/go-sso"
 	"github.com/natifdevelopment/go-utils"
 )
@@ -187,8 +189,41 @@ func RateLimitMiddleware(config RateLimitConfig) gin.HandlerFunc {
 		config.RequestsPerMinute = 100
 	}
 
-	// TODO: implement proper rate limiting using go-security/ratelimit
+	limiter := NewIPRateLimiter(config.RequestsPerMinute, time.Minute, 5*time.Minute)
+	return IPRateLimitMiddleware(limiter)
+}
+
+// SecurityHeadersMiddleware sets OWASP-recommended security response headers.
+func SecurityHeadersMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		c.Header("X-Content-Type-Options", "nosniff")
+		c.Header("X-Frame-Options", "DENY")
+		c.Header("Referrer-Policy", "strict-origin-when-cross-origin")
+		c.Header("Permissions-Policy", "geolocation=(), microphone=(), camera=()")
+		c.Header("Content-Security-Policy", "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'")
+
+		if config.ENVIRONMENT != config.ENV_DEV {
+			c.Header("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload")
+		}
+
+		c.Next()
+	}
+}
+
+// SecurityHeadersMiddlewareBasic sets a minimal set of security headers for
+// legacy services that do not yet support the full CSP policy.
+func SecurityHeadersMiddlewareBasic() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Header("X-Content-Type-Options", "nosniff")
+		c.Header("X-Frame-Options", "DENY")
+		c.Header("Referrer-Policy", "strict-origin-when-cross-origin")
+		c.Header("Permissions-Policy", "geolocation=(), microphone=(), camera=()")
+		c.Header("Content-Security-Policy", "default-src 'self'")
+
+		if config.ENVIRONMENT != config.ENV_DEV {
+			c.Header("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
+		}
+
 		c.Next()
 	}
 }
