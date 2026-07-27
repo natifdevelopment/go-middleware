@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	config "github.com/natifdevelopment/go-config"
 	"github.com/natifdevelopment/go-sso"
 	"github.com/natifdevelopment/go-utils"
@@ -20,6 +21,23 @@ func AuthGuard() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Check for gateway secret first (inter-service calls)
 		if sso.ValidateGatewaySecret(c.Request) {
+			// If Authorization header is present, parse JWT for full user context
+			if authHeader := c.GetHeader("Authorization"); authHeader != "" {
+				if claims, err := sso.ParseJWT(authHeader); err == nil {
+					c.Set("user", claims.User)
+					c.Set("page", claims.Page)
+					c.Set("activity", claims.Activity)
+					c.Set("pageActivity", claims.PageActivity)
+					c.Next()
+					return
+				}
+			}
+			// Fallback: use X-User-Id header
+			if userIDStr := c.GetHeader("X-User-Id"); userIDStr != "" {
+				if userID, err := uuid.Parse(userIDStr); err == nil {
+					c.Set("user", map[string]interface{}{"id": userID})
+				}
+			}
 			c.Next()
 			return
 		}
