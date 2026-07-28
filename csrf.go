@@ -24,7 +24,11 @@ func CsrfMiddleware() gin.HandlerFunc {
 			c.Request.Method == http.MethodPatch || c.Request.Method == http.MethodDelete {
 
 			csrfToken := c.GetHeader("X-CSRF-Token")
-			cookieToken, err := c.Cookie(config.COOKIE_PREFIX + "_csrf_token")
+			csrfCookieName := "csrf_token"
+			if config.COOKIE_PREFIX != "" {
+				csrfCookieName = config.COOKIE_PREFIX + "_csrf_token"
+			}
+			cookieToken, err := c.Cookie(csrfCookieName)
 
 			if err != nil || csrfToken == "" || csrfToken != cookieToken {
 				c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "Invalid CSRF token"})
