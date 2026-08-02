@@ -5,7 +5,7 @@ go 1.26.5
 require (
 	github.com/gin-gonic/gin v1.12.0
 	github.com/google/uuid v1.6.0
-	github.com/natifdevelopment/go-config v0.0.6
+	github.com/natifdevelopment/go-config v0.0.8
 	github.com/natifdevelopment/go-security v0.2.0
 	github.com/natifdevelopment/go-sso v0.1.0
 	github.com/natifdevelopment/go-utils v0.1.1
@@ -48,6 +48,7 @@ require (
 	github.com/pelletier/go-toml/v2 v2.3.1 // indirect
 	github.com/quic-go/qpack v0.6.0 // indirect
 	github.com/quic-go/quic-go v0.60.0 // indirect
+	github.com/rogpeppe/go-internal v1.15.0 // indirect
 	github.com/ryanuber/go-glob v1.0.0 // indirect
 	github.com/texttheater/golang-levenshtein/levenshtein v0.0.0-20200805054039-cae8b0eaed6c // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
