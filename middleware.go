@@ -101,7 +101,7 @@ func CORSMiddleware(config CORSConfig) gin.HandlerFunc {
 		config.AllowMethods = []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"}
 	}
 	if len(config.AllowHeaders) == 0 {
-		config.AllowHeaders = []string{"Origin", "Content-Type", "Accept", "Authorization", "X-Gateway-Secret", "X-CSRF-Token"}
+		config.AllowHeaders = []string{"Origin", "Content-Type", "Accept", "Authorization", "X-Gateway-Signature", "X-Gateway-Timestamp", "X-CSRF-Token"}
 	}
 
 	return func(c *gin.Context) {
