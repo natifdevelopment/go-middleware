@@ -42,9 +42,12 @@ func NewUserRateLimiter(client *redis.Client, limitPerMin int, blockPeriod time.
 	if blockPeriod <= 0 {
 		blockPeriod = 5 * time.Minute
 	}
+	// Use a per-limit key prefix so different tiers (read/write/upload/sensitive)
+	// do not share the same Redis counter. Without this, a burst of GET requests
+	// can exhaust the upload tier limit and cause 429s on multipart uploads.
 	return &UserRateLimiter{
 		client:      client,
-		keyPrefix:   "ratelimit",
+		keyPrefix:   fmt.Sprintf("ratelimit:limit%d", limitPerMin),
 		limitPerMin: limitPerMin,
 		blockPeriod: blockPeriod,
 	}
