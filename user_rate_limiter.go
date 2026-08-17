@@ -211,6 +211,16 @@ func TieredRateLimitMiddleware(client *redis.Client, config TieredRateLimitConfi
 		"/auth/reset":      true,
 		"/refresh-token":   true,
 		"/auth/refresh":    true,
+		// TOTP / authenticator endpoints — strict limit (10 req/min) to
+		// prevent brute-force of 6-digit codes (1M combinations).
+		"/totp/verify-setup":                 true,
+		"/auth/totp/verify-setup":            true,
+		"/totp/disable":                      true,
+		"/auth/totp/disable":                 true,
+		"/totp/regenerate-backup-codes":      true,
+		"/auth/totp/regenerate-backup-codes": true,
+		"/totp/setup":                        true,
+		"/auth/totp/setup":                   true,
 	}
 
 	return func(c *gin.Context) {
